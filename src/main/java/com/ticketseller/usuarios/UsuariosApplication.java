@@ -1,13 +1,12 @@
-package com.ingsoft.usersmodule;
+package com.ticketseller.usuarios;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UsersModuleApplication {
+public class UsuariosApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UsersModuleApplication.class, args);
+        SpringApplication.run(UsuariosApplication.class, args);
     }
-
 }

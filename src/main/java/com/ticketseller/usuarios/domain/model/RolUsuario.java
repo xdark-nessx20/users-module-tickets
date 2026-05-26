@@ -1,0 +1,12 @@
+package com.ticketseller.usuarios.domain.model;
+
+public enum RolUsuario {
+    ADMINISTRADOR_RECINTO,
+    GESTOR_INVENTARIO,
+    COORDINADOR_PATROCINIOS,
+    AGENTE_VENTAS,
+    COMPRADOR,
+    PROMOTOR_EVENTOS,
+    CONTROLADOR_ACCESOS,
+    ADMINISTRADOR_FINANCIERO
+}

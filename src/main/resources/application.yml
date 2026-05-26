@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: users-module
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/usuarios_dev
+    username: postgres
+    password: postgres
+
+app:
+  jwt:
+    secret: dev-secret-key-not-for-production-use-only
+    expiration-ms: 86400000
+
+server:
+  port: 8081
