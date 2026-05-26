@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -44,7 +43,7 @@ class UsuarioControllerTest {
 
     private String adminToken;
 
-    private final Usuario usuarioActualizado = Usuario.builder()
+    private final Usuario usuarioBaneado = Usuario.builder()
             .id(objetivoId)
             .nombre("Pedro")
             .email("pedro@test.com")
@@ -52,6 +51,28 @@ class UsuarioControllerTest {
             .passwordHash("hash")
             .rol(RolUsuario.COMPRADOR)
             .estado(EstadoUsuario.BANNED)
+            .fechaCreacion(LocalDateTime.now())
+            .build();
+
+    private final Usuario usuarioInactivo = Usuario.builder()
+            .id(objetivoId)
+            .nombre("Pedro")
+            .email("pedro@test.com")
+            .telefono("3001234567")
+            .passwordHash("hash")
+            .rol(RolUsuario.COMPRADOR)
+            .estado(EstadoUsuario.INACTIVO)
+            .fechaCreacion(LocalDateTime.now())
+            .build();
+
+    private final Usuario usuarioActivo = Usuario.builder()
+            .id(objetivoId)
+            .nombre("Pedro")
+            .email("pedro@test.com")
+            .telefono("3001234567")
+            .passwordHash("hash")
+            .rol(RolUsuario.COMPRADOR)
+            .estado(EstadoUsuario.ACTIVO)
             .fechaCreacion(LocalDateTime.now())
             .build();
 
@@ -72,16 +93,12 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void cambiarEstado_conTokenValidoYEstadoValido_retornaHttp200() {
+    void banear_conTokenValido_retornaHttp200ConEstadoBanned() {
         when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
-                .thenReturn(Mono.just(usuarioActualizado));
+                .thenReturn(Mono.just(usuarioBaneado));
 
-        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", objetivoId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/banear", objetivoId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {"estado":"BANNED"}
-                        """)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -89,27 +106,45 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void cambiarEstado_sinToken_retornaHttp401() {
-        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", objetivoId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {"estado":"BANNED"}
-                        """)
+    void desactivar_conTokenValido_retornaHttp200ConEstadoInactivo() {
+        when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
+                .thenReturn(Mono.just(usuarioInactivo));
+
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/desactivar", objetivoId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.estado").isEqualTo("INACTIVO");
+    }
+
+    @Test
+    void reactivar_conTokenValido_retornaHttp200ConEstadoActivo() {
+        when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
+                .thenReturn(Mono.just(usuarioActivo));
+
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/reactivar", objetivoId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.estado").isEqualTo("ACTIVO");
+    }
+
+    @Test
+    void banear_sinToken_retornaHttp401() {
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/banear", objetivoId)
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
 
     @Test
-    void cambiarEstado_conUUIDInexistente_retornaHttp404() {
+    void banear_conUUIDInexistente_retornaHttp404() {
         when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
                 .thenReturn(Mono.error(new UsuarioNotFoundException()));
 
-        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", objetivoId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/banear", objetivoId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {"estado":"BANNED"}
-                        """)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
@@ -117,16 +152,12 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void cambiarEstado_administradorCambiaPropiEstado_retornaHttp409() {
+    void desactivar_administradorCambiaPropiEstado_retornaHttp409() {
         when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
                 .thenReturn(Mono.error(new AutoCambioEstadoException()));
 
-        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", adminId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/desactivar", adminId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {"estado":"INACTIVO"}
-                        """)
                 .exchange()
                 .expectStatus().isEqualTo(409)
                 .expectBody()
