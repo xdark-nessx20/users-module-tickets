@@ -1,6 +1,5 @@
 package com.ticketseller.usuarios.infrastructure.adapter.in.rest;
 
-import com.ticketseller.usuarios.TestcontainersConfiguration;
 import com.ticketseller.usuarios.application.LoginUsuarioUseCase;
 import com.ticketseller.usuarios.application.RegistrarUsuarioUseCase;
 import com.ticketseller.usuarios.domain.exception.CredencialesInvalidasException;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -28,8 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestcontainersConfiguration.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.r2dbc.pool.initial-size=0")
 class AuthControllerTest {
 
     @LocalServerPort

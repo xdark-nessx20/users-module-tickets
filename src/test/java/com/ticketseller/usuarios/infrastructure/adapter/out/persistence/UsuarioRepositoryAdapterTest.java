@@ -85,6 +85,7 @@ class UsuarioRepositoryAdapterTest {
     @Test
     void buscarPorId_conIdExistente_retornaUsuario() {
         Usuario guardado = repositoryPort.guardar(usuarioEjemplo("porid@test.com")).block();
+        assert guardado != null;
         UUID id = guardado.getId();
 
         StepVerifier.create(repositoryPort.buscarPorId(id))
@@ -98,9 +99,10 @@ class UsuarioRepositoryAdapterTest {
     @Test
     void guardar_usuarioExistente_actualizaEstado() {
         Usuario original = repositoryPort.guardar(usuarioEjemplo("actualizar@test.com")).block();
-        Usuario actualizado = original.banear();
+        assert original != null;
+        original.banear();
 
-        StepVerifier.create(repositoryPort.guardar(actualizado))
+        StepVerifier.create(repositoryPort.guardar(original))
                 .assertNext(saved -> assertThat(saved.getEstado()).isEqualTo(EstadoUsuario.BANNED))
                 .verifyComplete();
     }

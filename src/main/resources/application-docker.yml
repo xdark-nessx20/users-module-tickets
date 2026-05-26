@@ -1,0 +1,13 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://db:5432/usuarios_dev
+    username: postgres
+    password: postgres
+
+app:
+  jwt:
+    secret: docker-secret-key-not-for-production-use-only
+    expiration-ms: 86400000
+
+server:
+  port: 8081

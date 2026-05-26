@@ -9,7 +9,10 @@
       "Bash(python3 *)",
       "Bash(xargs '-I{}' python3 -c ' *)",
       "Bash(./gradlew test *)",
-      "Bash(./gradlew build *)"
+      "Bash(./gradlew build *)",
+      "Bash(docker info *)",
+      "Bash(systemctl status *)",
+      "Bash(xargs ls *)"
     ]
   }
 }
