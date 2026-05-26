@@ -4,7 +4,9 @@ import com.ticketseller.usuarios.domain.exception.AutoCambioEstadoException;
 import com.ticketseller.usuarios.domain.exception.CredencialesInvalidasException;
 import com.ticketseller.usuarios.domain.exception.CuentaBanneadaException;
 import com.ticketseller.usuarios.domain.exception.CuentaInactivaException;
+import com.ticketseller.usuarios.domain.exception.DatosUsuarioInvalidosException;
 import com.ticketseller.usuarios.domain.exception.EmailDuplicadoException;
+import com.ticketseller.usuarios.domain.exception.TransicionEstadoInvalidaException;
 import com.ticketseller.usuarios.domain.exception.UsuarioNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +54,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAutoCambioEstado(AutoCambioEstadoException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ApiErrorResponse(409, ex.getMessage()));
+    }
+
+    @ExceptionHandler(TransicionEstadoInvalidaException.class)
+    public ResponseEntity<ApiErrorResponse> handleTransicionEstadoInvalida(TransicionEstadoInvalidaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiErrorResponse(409, ex.getMessage()));
+    }
+
+    @ExceptionHandler(DatosUsuarioInvalidosException.class)
+    public ResponseEntity<ApiErrorResponse> handleDatosUsuarioInvalidos(DatosUsuarioInvalidosException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ApiErrorResponse(422, ex.getMessage()));
     }
 
     @ExceptionHandler(WebExchangeBindException.class)

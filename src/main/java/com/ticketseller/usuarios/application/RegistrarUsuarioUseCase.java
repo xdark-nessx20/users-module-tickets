@@ -19,21 +19,25 @@ public class RegistrarUsuarioUseCase {
 
     public Mono<Usuario> ejecutar(String nombre, String email, String telefono, String password, RolUsuario rol) {
         return repositoryPort.existePorEmail(email)
-                .flatMap(existe -> {
-                    if (existe) {
-                        return Mono.error(new EmailDuplicadoException());
-                    }
+                .filter(existe -> !existe)
+                .switchIfEmpty(Mono.error(new EmailDuplicadoException()))
+                .flatMap(ignored -> {
                     String passwordHash = passwordEncoder.encode(password);
-                    Usuario usuario = Usuario.builder()
-                            .nombre(nombre)
-                            .email(email)
-                            .telefono(telefono)
-                            .passwordHash(passwordHash)
-                            .rol(rol)
-                            .estado(EstadoUsuario.ACTIVO)
-                            .fechaCreacion(LocalDateTime.now())
-                            .build();
+                    Usuario usuario = buildUsuario(nombre, email, telefono, passwordHash, rol);
+                    usuario.validar();
                     return repositoryPort.guardar(usuario);
                 });
+    }
+
+    private Usuario buildUsuario(String nombre, String email, String telefono, String passwordHash, RolUsuario rol) {
+        return Usuario.builder()
+                .nombre(nombre)
+                .email(email)
+                .telefono(telefono)
+                .passwordHash(passwordHash)
+                .rol(rol)
+                .estado(EstadoUsuario.ACTIVO)
+                .fechaCreacion(LocalDateTime.now())
+                .build();
     }
 }

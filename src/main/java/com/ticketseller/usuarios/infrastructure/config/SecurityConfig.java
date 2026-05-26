@@ -1,6 +1,7 @@
 package com.ticketseller.usuarios.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -48,7 +49,7 @@ public class SecurityConfig {
         private final JwtConfig jwtConfig;
 
         @Override
-        public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        public Mono<Void> filter(ServerWebExchange exchange, @NonNull WebFilterChain chain) {
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return chain.filter(exchange);

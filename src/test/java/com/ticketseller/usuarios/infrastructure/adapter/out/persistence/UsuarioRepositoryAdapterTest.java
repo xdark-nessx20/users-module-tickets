@@ -98,7 +98,7 @@ class UsuarioRepositoryAdapterTest {
     @Test
     void guardar_usuarioExistente_actualizaEstado() {
         Usuario original = repositoryPort.guardar(usuarioEjemplo("actualizar@test.com")).block();
-        Usuario actualizado = original.conEstado(EstadoUsuario.BANNED);
+        Usuario actualizado = original.banear();
 
         StepVerifier.create(repositoryPort.guardar(actualizado))
                 .assertNext(saved -> assertThat(saved.getEstado()).isEqualTo(EstadoUsuario.BANNED))

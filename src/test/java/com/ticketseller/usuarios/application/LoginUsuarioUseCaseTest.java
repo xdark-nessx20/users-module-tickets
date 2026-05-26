@@ -74,8 +74,8 @@ class LoginUsuarioUseCaseTest {
 
     @Test
     void ejecutar_conUsuarioInactivo_lanzaCuentaInactiva() {
-        Usuario inactivo = usuarioActivo.conEstado(EstadoUsuario.INACTIVO);
-        when(repositoryPort.buscarPorEmail("activo@test.com")).thenReturn(Mono.just(inactivo));
+        usuarioActivo.desactivar();
+        when(repositoryPort.buscarPorEmail("activo@test.com")).thenReturn(Mono.just(usuarioActivo));
         when(passwordEncoder.matches("pass", "hashed")).thenReturn(true);
 
         StepVerifier.create(useCase.ejecutar("activo@test.com", "pass"))
@@ -85,8 +85,8 @@ class LoginUsuarioUseCaseTest {
 
     @Test
     void ejecutar_conUsuarioBanned_lanzaCuentaBanneada() {
-        Usuario banned = usuarioActivo.conEstado(EstadoUsuario.BANNED);
-        when(repositoryPort.buscarPorEmail("activo@test.com")).thenReturn(Mono.just(banned));
+        usuarioActivo.banear();
+        when(repositoryPort.buscarPorEmail("activo@test.com")).thenReturn(Mono.just(usuarioActivo));
         when(passwordEncoder.matches("pass", "hashed")).thenReturn(true);
 
         StepVerifier.create(useCase.ejecutar("activo@test.com", "pass"))

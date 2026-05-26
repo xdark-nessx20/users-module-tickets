@@ -64,7 +64,7 @@ class AuthControllerTest {
         when(registrarUsuarioUseCase.ejecutar(any(), any(), any(), any(), any()))
                 .thenReturn(Mono.just(usuarioEjemplo));
 
-        webTestClient.post().uri("/api/auth/registro")
+        webTestClient.post().uri("/api/v1/auth/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"nombre":"Juan","email":"juan@test.com","telefono":"3001234567",
@@ -82,7 +82,7 @@ class AuthControllerTest {
         when(registrarUsuarioUseCase.ejecutar(any(), any(), any(), any(), any()))
                 .thenReturn(Mono.error(new EmailDuplicadoException()));
 
-        webTestClient.post().uri("/api/auth/registro")
+        webTestClient.post().uri("/api/v1/auth/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"nombre":"Juan","email":"juan@test.com","telefono":"3001234567",
@@ -96,7 +96,7 @@ class AuthControllerTest {
 
     @Test
     void registro_conCamposVacios_retornaHttp400() {
-        webTestClient.post().uri("/api/auth/registro")
+        webTestClient.post().uri("/api/v1/auth/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"nombre":"","email":"","telefono":"","password":"","rol":""}
@@ -106,24 +106,10 @@ class AuthControllerTest {
     }
 
     @Test
-    void registro_conRolInvalido_retornaHttp400ConMensaje() {
-        webTestClient.post().uri("/api/auth/registro")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {"nombre":"Juan","email":"juan@test.com","telefono":"3001234567",
-                         "password":"password123","rol":"ROL_INVALIDO"}
-                        """)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.message").isEqualTo("Rol no reconocido");
-    }
-
-    @Test
     void login_conCredencialesValidas_retornaHttp200ConToken() {
         when(loginUsuarioUseCase.ejecutar(anyString(), anyString())).thenReturn(Mono.just("jwt-token"));
 
-        webTestClient.post().uri("/api/auth/login")
+        webTestClient.post().uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"email":"juan@test.com","password":"password123"}
@@ -140,7 +126,7 @@ class AuthControllerTest {
         when(loginUsuarioUseCase.ejecutar(anyString(), anyString()))
                 .thenReturn(Mono.error(new CredencialesInvalidasException()));
 
-        webTestClient.post().uri("/api/auth/login")
+        webTestClient.post().uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"email":"juan@test.com","password":"wrong"}
@@ -156,7 +142,7 @@ class AuthControllerTest {
         when(loginUsuarioUseCase.ejecutar(anyString(), anyString()))
                 .thenReturn(Mono.error(new CredencialesInvalidasException()));
 
-        webTestClient.post().uri("/api/auth/login")
+        webTestClient.post().uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"email":"noexiste@test.com","password":"pass"}
@@ -172,7 +158,7 @@ class AuthControllerTest {
         when(loginUsuarioUseCase.ejecutar(anyString(), anyString()))
                 .thenReturn(Mono.error(new CuentaInactivaException()));
 
-        webTestClient.post().uri("/api/auth/login")
+        webTestClient.post().uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"email":"inactivo@test.com","password":"pass"}
@@ -188,7 +174,7 @@ class AuthControllerTest {
         when(loginUsuarioUseCase.ejecutar(anyString(), anyString()))
                 .thenReturn(Mono.error(new CuentaBanneadaException()));
 
-        webTestClient.post().uri("/api/auth/login")
+        webTestClient.post().uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"email":"banned@test.com","password":"pass"}

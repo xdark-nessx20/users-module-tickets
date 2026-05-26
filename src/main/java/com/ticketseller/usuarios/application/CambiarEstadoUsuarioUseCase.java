@@ -16,11 +16,24 @@ public class CambiarEstadoUsuarioUseCase {
     private final UsuarioRepositoryPort repositoryPort;
 
     public Mono<Usuario> ejecutar(UUID idObjetivo, UUID idAutenticado, EstadoUsuario nuevoEstado) {
-        if (idObjetivo.equals(idAutenticado)) {
+        if (idCoincide(idAutenticado, idObjetivo)) {
             return Mono.error(new AutoCambioEstadoException());
         }
         return repositoryPort.buscarPorId(idObjetivo)
                 .switchIfEmpty(Mono.error(new UsuarioNotFoundException()))
-                .flatMap(usuario -> repositoryPort.guardar(usuario.conEstado(nuevoEstado)));
+                .flatMap(usuario -> repositoryPort.guardar(aplicarTransicion(usuario, nuevoEstado)));
+    }
+
+    private Usuario aplicarTransicion(Usuario usuario, EstadoUsuario nuevoEstado) {
+        switch (nuevoEstado) {
+            case INACTIVO -> usuario.desactivar();
+            case BANNED -> usuario.banear();
+            case ACTIVO -> usuario.reactivar();
+        };
+        return usuario;
+    }
+
+    private boolean idCoincide(UUID idAutenticado, UUID idObjetivo) {
+        return idObjetivo.equals(idAutenticado);
     }
 }

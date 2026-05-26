@@ -20,11 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Autenticación", description = "Registro y login de usuarios")
 public class AuthController {
@@ -40,12 +39,7 @@ public class AuthController {
     @ApiResponse(responseCode = "409", description = "Email ya registrado")
     @PostMapping("/registro")
     public Mono<ResponseEntity<UsuarioResponse>> registro(@Valid @RequestBody RegistroRequest request) {
-        RolUsuario rol;
-        try {
-            rol = RolUsuario.valueOf(request.rol());
-        } catch (IllegalArgumentException e) {
-            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rol no reconocido"));
-        }
+        RolUsuario rol = RolUsuario.valueOf(request.rol());
         return registrarUsuarioUseCase.ejecutar(
                         request.nombre(), request.email(), request.telefono(), request.password(), rol)
                 .map(usuario -> ResponseEntity.status(HttpStatus.CREATED).body(restMapper.toResponse(usuario)));

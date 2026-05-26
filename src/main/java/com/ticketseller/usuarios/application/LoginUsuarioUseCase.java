@@ -3,6 +3,7 @@ package com.ticketseller.usuarios.application;
 import com.ticketseller.usuarios.domain.exception.CredencialesInvalidasException;
 import com.ticketseller.usuarios.domain.exception.CuentaBanneadaException;
 import com.ticketseller.usuarios.domain.exception.CuentaInactivaException;
+import com.ticketseller.usuarios.domain.model.Usuario;
 import com.ticketseller.usuarios.domain.repository.UsuarioRepositoryPort;
 import com.ticketseller.usuarios.infrastructure.config.JwtConfig;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,20 @@ public class LoginUsuarioUseCase {
     public Mono<String> ejecutar(String email, String password) {
         return repositoryPort.buscarPorEmail(email)
                 .switchIfEmpty(Mono.error(new CredencialesInvalidasException()))
-                .flatMap(usuario -> {
-                    if (!passwordEncoder.matches(password, usuario.getPasswordHash())) {
-                        return Mono.error(new CredencialesInvalidasException());
-                    }
-                    return switch (usuario.getEstado()) {
-                        case INACTIVO -> Mono.error(new CuentaInactivaException());
-                        case BANNED -> Mono.error(new CuentaBanneadaException());
-                        default -> Mono.just(jwtConfig.generarToken(usuario));
-                    };
-                });
+                .filter(usuario -> passwordCoincide(password, usuario))
+                .switchIfEmpty(Mono.error(new CredencialesInvalidasException()))
+                .flatMap(this::generarTokenSegunEstado);
+    }
+
+    private Mono<String> generarTokenSegunEstado(Usuario usuario) {
+        return switch (usuario.getEstado()) {
+            case INACTIVO -> Mono.error(new CuentaInactivaException());
+            case BANNED -> Mono.error(new CuentaBanneadaException());
+            default -> Mono.just(jwtConfig.generarToken(usuario));
+        };
+    }
+
+    private boolean passwordCoincide(String password, Usuario usuario) {
+        return passwordEncoder.matches(password, usuario.getPasswordHash());
     }
 }

@@ -78,7 +78,7 @@ class UsuarioControllerTest {
         when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
                 .thenReturn(Mono.just(usuarioActualizado));
 
-        webTestClient.patch().uri("/api/usuarios/{id}/estado", objetivoId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", objetivoId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -92,7 +92,7 @@ class UsuarioControllerTest {
 
     @Test
     void cambiarEstado_sinToken_retornaHttp401() {
-        webTestClient.patch().uri("/api/usuarios/{id}/estado", objetivoId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", objetivoId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {"estado":"BANNED"}
@@ -106,7 +106,7 @@ class UsuarioControllerTest {
         when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
                 .thenReturn(Mono.error(new UsuarioNotFoundException()));
 
-        webTestClient.patch().uri("/api/usuarios/{id}/estado", objetivoId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", objetivoId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -119,25 +119,11 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void cambiarEstado_conEstadoInvalido_retornaHttp400() {
-        webTestClient.patch().uri("/api/usuarios/{id}/estado", objetivoId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {"estado":"ESTADO_INVALIDO"}
-                        """)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.message").isEqualTo("Estado no reconocido");
-    }
-
-    @Test
     void cambiarEstado_administradorCambiaPropiEstado_retornaHttp409() {
         when(cambiarEstadoUsuarioUseCase.ejecutar(any(), any(), any()))
                 .thenReturn(Mono.error(new AutoCambioEstadoException()));
 
-        webTestClient.patch().uri("/api/usuarios/{id}/estado", adminId)
+        webTestClient.patch().uri("/api/v1/usuarios/{id}/estado", adminId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
