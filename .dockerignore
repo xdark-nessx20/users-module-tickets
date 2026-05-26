@@ -1,0 +1,10 @@
+.gradle/
+build/
+.git/
+.claude/
+*.iml
+docs/
+HELP.md
+CLAUDE.md
+example.env
+.env

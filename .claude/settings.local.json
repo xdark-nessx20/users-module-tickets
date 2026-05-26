@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava *)",
+      "Bash(./gradlew compileTestJava *)",
+      "Bash(./gradlew dependencies *)",
+      "Bash(jar tf *)",
+      "Bash(unzip -l /home/nestor/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-test-autoconfigure/4.0.6/268908eb95b5483157544d79155ef7e0dd521798/spring-boot-test-autoconfigure-4.0.6.jar)",
+      "Bash(python3 *)",
+      "Bash(xargs '-I{}' python3 -c ' *)",
+      "Bash(./gradlew test *)",
+      "Bash(./gradlew build *)",
+      "Bash(docker info *)",
+      "Bash(systemctl status *)",
+      "Bash(xargs ls *)"
+    ]
+  }
+}
