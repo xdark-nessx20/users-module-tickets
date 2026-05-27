@@ -1,11 +1,11 @@
-FROM eclipse-temurin:21-jdk AS build
+FROM gradle:9.4.1-jdk21 AS build
 WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 COPY src src
-RUN chmod +x gradlew && ./gradlew build -x test --no-daemon
+RUN gradle build --no-daemon -x test
 
 FROM eclipse-temurin:21-jre
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
