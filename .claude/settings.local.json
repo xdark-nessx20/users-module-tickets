@@ -12,7 +12,9 @@
       "Bash(./gradlew build *)",
       "Bash(docker info *)",
       "Bash(systemctl status *)",
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Bash(xargs cat *)",
+      "Bash(xargs -I {} basename {})"
     ]
   }
 }
