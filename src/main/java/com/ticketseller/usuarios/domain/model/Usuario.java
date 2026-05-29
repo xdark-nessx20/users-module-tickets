@@ -59,9 +59,25 @@ public class Usuario {
     }
 
     public void validar() {
-        if (nombre == null || nombre.isBlank()) throw new DatosUsuarioInvalidosException("nombre");
-        if (email == null || email.isBlank()) throw new DatosUsuarioInvalidosException("email");
-        if (passwordHash == null || passwordHash.isBlank()) throw new DatosUsuarioInvalidosException("passwordHash");
-        if (rol == null) throw new DatosUsuarioInvalidosException("rol");
+        if (nombreInvalido()) throw new DatosUsuarioInvalidosException("nombre");
+        if (emailInvalido()) throw new DatosUsuarioInvalidosException("email");
+        if (noHayPassword()) throw new DatosUsuarioInvalidosException("passwordHash");
+        if (sinRol()) throw new DatosUsuarioInvalidosException("rol");
+    }
+
+    private boolean nombreInvalido(){
+        return nombre == null || nombre.isBlank();
+    }
+
+    private boolean emailInvalido(){
+        return email == null || email.isBlank();
+    }
+
+    private boolean noHayPassword(){
+        return passwordHash == null || passwordHash.isBlank();
+    }
+
+    private boolean sinRol(){
+        return rol == null;
     }
 }

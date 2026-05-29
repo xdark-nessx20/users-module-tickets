@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: users-module
   r2dbc:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -11,3 +13,18 @@ app:
 
 server:
   port: ${SERVER_PORT:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+    com.ticketseller: INFO
